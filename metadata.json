@@ -1,6 +1,6 @@
 {
   "name": "Terrascan - Land Area Calculator",
-  "description": "Professional suite for precision land area measurements and multi-unit conversions with a sleek, high-fidelity interface.",
+  "description": "Professional land area calculator for length and width dimensions. Convert instantly between Square Meters, Square Feet, Acres, Hectares, and Decimals with high precision.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
