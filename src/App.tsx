@@ -16,7 +16,7 @@ import {
   Info 
 } from 'lucide-react';
 
-type InputUnit = 'Meters' | 'Feet' | 'Yards' | 'Inches';
+type InputUnit = 'Meters' | 'Feet' | 'Yards' | 'Inches' | 'Feet & Inches';
 
 interface Results {
   sqMeters: number;
@@ -30,38 +30,55 @@ const UNIT_LABELS: Record<InputUnit, string> = {
   Meters: 'm',
   Feet: 'ft',
   Yards: 'yd',
-  Inches: 'in'
+  Inches: 'in',
+  'Feet & Inches': 'ft/in'
 };
 
 export default function App() {
   const [length, setLength] = useState<string>('');
+  const [lengthInches, setLengthInches] = useState<string>('');
   const [width, setWidth] = useState<string>('');
+  const [widthInches, setWidthInches] = useState<string>('');
   const [unit, setUnit] = useState<InputUnit>('Meters');
   const [results, setResults] = useState<Results | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
   const calculateArea = useCallback(() => {
-    const l = parseFloat(length);
-    const w = parseFloat(width);
+    const lFeet = parseFloat(length) || 0;
+    const lInches = parseFloat(lengthInches) || 0;
+    const wFeet = parseFloat(width) || 0;
+    const wInches = parseFloat(widthInches) || 0;
 
-    if (isNaN(l) || isNaN(w)) return;
+    // Validation
+    if (unit !== 'Feet & Inches') {
+        if (isNaN(parseFloat(length)) || isNaN(parseFloat(width))) return;
+    } else {
+        if (!length && !lengthInches && !width && !widthInches) return;
+    }
 
-    // Convert inputs to meters first
-    let lInMeters = l;
-    let wInMeters = w;
+    let lInMeters = 0;
+    let wInMeters = 0;
 
     switch (unit) {
+      case 'Meters':
+        lInMeters = parseFloat(length);
+        wInMeters = parseFloat(width);
+        break;
       case 'Feet':
-        lInMeters = l * 0.3048;
-        wInMeters = w * 0.3048;
+        lInMeters = parseFloat(length) * 0.3048;
+        wInMeters = parseFloat(width) * 0.3048;
         break;
       case 'Yards':
-        lInMeters = l * 0.9144;
-        wInMeters = w * 0.9144;
+        lInMeters = parseFloat(length) * 0.9144;
+        wInMeters = parseFloat(width) * 0.9144;
         break;
       case 'Inches':
-        lInMeters = l * 0.0254;
-        wInMeters = w * 0.0254;
+        lInMeters = parseFloat(length) * 0.0254;
+        wInMeters = parseFloat(width) * 0.0254;
+        break;
+      case 'Feet & Inches':
+        lInMeters = (lFeet + lInches / 12) * 0.3048;
+        wInMeters = (wFeet + wInches / 12) * 0.3048;
         break;
     }
 
@@ -74,7 +91,7 @@ export default function App() {
       hectares: sqMeters / 10000,
       decimals: sqMeters / 40.46856, 
     });
-  }, [length, width, unit]);
+  }, [length, lengthInches, width, widthInches, unit]);
 
   const copyValue = async (val: number, label: string) => {
     try {
@@ -88,7 +105,9 @@ export default function App() {
 
   const reset = () => {
     setLength('');
+    setLengthInches('');
     setWidth('');
+    setWidthInches('');
     setResults(null);
   };
 
@@ -122,38 +141,90 @@ export default function App() {
               </div>
 
               <div className="space-y-6">
+                {/* Length Input */}
                 <div className="space-y-2">
                   <label htmlFor="length" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Length</label>
-                  <div className="relative">
-                    <input
-                      id="length"
-                      type="number"
-                      placeholder="0.00"
-                      value={length}
-                      onChange={(e) => setLength(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                      {UNIT_LABELS[unit]}
+                  {unit === 'Feet & Inches' ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="relative">
+                        <input
+                          type="number"
+                          placeholder="Feet"
+                          value={length}
+                          onChange={(e) => setLength(e.target.value)}
+                          className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase">FT</div>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          placeholder="Inches"
+                          value={lengthInches}
+                          onChange={(e) => setLengthInches(e.target.value)}
+                          className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase">IN</div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        id="length"
+                        type="number"
+                        placeholder="0.00"
+                        value={length}
+                        onChange={(e) => setLength(e.target.value)}
+                        className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                        {UNIT_LABELS[unit]}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
+                {/* Width Input */}
                 <div className="space-y-2">
                   <label htmlFor="width" className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 ml-1">Width</label>
-                  <div className="relative">
-                    <input
-                      id="width"
-                      type="number"
-                      placeholder="0.00"
-                      value={width}
-                      onChange={(e) => setWidth(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                      {UNIT_LABELS[unit]}
+                  {unit === 'Feet & Inches' ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="relative">
+                        <input
+                          type="number"
+                          placeholder="Feet"
+                          value={width}
+                          onChange={(e) => setWidth(e.target.value)}
+                          className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase">FT</div>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          placeholder="Inches"
+                          value={widthInches}
+                          onChange={(e) => setWidthInches(e.target.value)}
+                          className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase">IN</div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        id="width"
+                        type="number"
+                        placeholder="0.00"
+                        value={width}
+                        onChange={(e) => setWidth(e.target.value)}
+                        className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900"
+                      />
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                        {UNIT_LABELS[unit]}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -163,7 +234,7 @@ export default function App() {
                     onChange={(e) => setUnit(e.target.value as InputUnit)}
                     className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all text-base font-medium outline-none text-slate-900 appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2364748b%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat"
                   >
-                    {(['Meters', 'Feet', 'Yards', 'Inches'] as InputUnit[]).map((u) => (
+                    {(['Meters', 'Feet', 'Yards', 'Inches', 'Feet & Inches'] as InputUnit[]).map((u) => (
                       <option key={u} value={u}>{u}</option>
                     ))}
                   </select>
@@ -172,7 +243,7 @@ export default function App() {
                 <div className="flex flex-col gap-3 pt-6 mt-auto">
                   <button
                     onClick={calculateArea}
-                    disabled={!length || !width}
+                    disabled={(!length && !lengthInches) || (!width && !widthInches)}
                     className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 group"
                   >
                     Calculate Area
