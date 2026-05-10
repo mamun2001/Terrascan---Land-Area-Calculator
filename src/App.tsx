@@ -24,6 +24,8 @@ interface Results {
   acres: number;
   decimals: number;
   hectares: number;
+  kathas: number;
+  bighas: number;
 }
 
 const UNIT_LABELS: Record<InputUnit, string> = {
@@ -83,13 +85,16 @@ export default function App() {
     }
 
     const sqMeters = lInMeters * wInMeters;
+    const sqFeet = sqMeters / 0.09290304;
 
     setResults({
       sqMeters,
-      sqFeet: sqMeters / 0.09290304,
+      sqFeet,
       acres: sqMeters / 4046.856,
       hectares: sqMeters / 10000,
       decimals: sqMeters / 40.46856, 
+      kathas: sqFeet / 720,
+      bighas: sqFeet / 14400,
     });
   }, [length, lengthInches, width, widthInches, unit]);
 
@@ -337,6 +342,20 @@ export default function App() {
                       onCopy={() => copyValue(results.hectares, 'hectares')}
                       isCopied={copied === 'hectares'}
                     />
+                    <ResultTile 
+                      label="Kathas" 
+                      value={results.kathas} 
+                      unit="katha" 
+                      onCopy={() => copyValue(results.kathas, 'kathas')}
+                      isCopied={copied === 'kathas'}
+                    />
+                    <ResultTile 
+                      label="Bighas" 
+                      value={results.bighas} 
+                      unit="bigha" 
+                      onCopy={() => copyValue(results.bighas, 'bighas')}
+                      isCopied={copied === 'bighas'}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -346,7 +365,7 @@ export default function App() {
               <p className="text-[11px] leading-relaxed text-slate-400 font-medium text-center">
                 Precision engineering for architectural and agricultural measurement calculations. 
                 <br className="hidden sm:block" />
-                Standard conversion factor: 1 Decimal = 1/100 Acre (approx. 40.47m²).
+                Standard conversion factors: 1 Decimal = 1/100 Acre, 1 Katha = 720 sq ft, 1 Bigha = 20 Kathas.
               </p>
             </div>
           </section>
