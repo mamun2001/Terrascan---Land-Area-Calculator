@@ -123,12 +123,10 @@ export default function App() {
         <nav className="flex flex-col sm:flex-row justify-between items-center px-2 gap-4">
           <div className="text-2xl font-bold text-indigo-600 tracking-tighter flex items-center gap-2">
             <MapIcon className="w-6 h-6" />
-            <span>Terrascan<span className="text-slate-400 font-light">.io</span></span>
+            <span>Utilities<span className="text-slate-400 font-light">bd</span></span>
           </div>
-          <div className="text-[13px] font-semibold text-slate-500 uppercase tracking-widest flex items-center gap-4">
-            <span>v2.4 Professional Suite</span>
-            <div className="h-4 w-px bg-slate-300 hidden sm:block"></div>
-            <span className="text-indigo-500">Live Precision</span>
+          <div className="text-[13px] font-semibold text-indigo-500 uppercase tracking-widest">
+            <span>Live Precision</span>
           </div>
         </nav>
 
@@ -138,6 +136,7 @@ export default function App() {
           {/* Input Side Section */}
           <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="p-8 flex flex-col h-full">
+              <h1 className="text-xl font-bold text-slate-800 text-center mb-6">Calculate Area</h1>
               <div className="flex items-center gap-3 mb-8">
                 <div className="p-2 bg-indigo-50 rounded-lg">
                   <Calculator className="w-5 h-5 text-indigo-600" />
@@ -374,7 +373,7 @@ export default function App() {
 
         <footer className="text-center mt-auto md:mt-12">
           <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-slate-300">
-            Powered by Terrascan Precision Engine
+            Powered by Utilitiesbd Precision Engine
           </p>
         </footer>
       </div>
